@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>JS jak JavaScript, O jak observability</title>
+
+    <link rel="stylesheet" href="dist/reset.css" />
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/black.css" />
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/zenburn.css" />
+    <link href="tailwind.css" rel="stylesheet" />
+    <!-- <script src="plugin/highlight/highlight.js"></script> -->
+  </head>
+  <body>
+    <div class="reveal">
+      <!-- <div class="slides" data-load="slides_intro.html"></div> -->
+      <!-- <div class="slides"></div> -->
+      <div class="slides">
+        <section>
+          <div><small>Kod źródłowy prezentacji / slajdów:</small></div>
+          <div><small> https://github.com/hzub/observability</small></div>
+        </section>
+        <section>
+          <strong class="text-orange-300">JS</strong> jak JavaScript,
+          <strong class="text-blue-300">O</strong> jak Observability
+          <p class="text-2xl">Hubert Zub, Future Conf 2023</p>
+          <aside class="notes">
+            <li>jestem Hubert</li>
+            <li>dziękuję za zaproszenie Andrzejowi i Grześkowi</li>
+            <li>z Białegostoku</li>
+            <li>zanim przejdę dalej</li>
+            <li>ta konferencja pół o JS, pół o AI</li>
+            <li>
+              no właśnie - jutro na tych deskach bedzie sporo mówione o machine
+              learningu, czyli o przetwarzaniu danych
+            </li>
+            <li>znajdowaniu korelacji, przewidywaniu trendów etc.</li>
+            <li>
+              jedną z mocnych gałęzi w dzisiejszym internecie i w robieniu
+              internetu jest analiza działań użytkowników
+            </li>
+            <li>
+              nie chodzi tylko o zbieranie ciastek po to żeby wam potem przez
+              tydzień wyświetlać towar którego szukaliście do zakupu
+            </li>
+            <li>
+              ale tez o logowanie zachowań użytkowników, informacji o wydajności
+              i stabilności aplikacji
+            </li>
+            <li>
+              celem predykcji zachowań, optymalizacji ficzerów, przewidywania
+              trendów etc
+            </li>
+            <li>
+              jako twórcy softwareu, czy to my-inżynierowie, czy to zespół
+              produktowy - chcemy wiedzieć o naszych appkach coraz więcej i tę
+              wiedzę zbieramy, po czym wykorzystujemy ją do tego żeby aplikacje
+              poprawiać, czynić wolnymi od błędów, by potocznie śledzić userów
+              by w kolejnej wersji appki przewidzieć ich kolejny krok
+            </li>
+            <li>ale te dane skądś się biorą</li>
+            <li>i ja dzisiaj trochę o tym</li>
+          </aside>
+        </section>
+        <section>
+          <h3>Kto mówi?</h3>
+          <div style="display: grid; grid-auto-flow: column">
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5em;
+              "
+            >
+              <div class="fragment" data-fragment-index="1">👋 Hubert Zub</div>
+              <div
+                class="fragment"
+                data-fragment-index="2"
+                style="display: flex; gap: 0.2em; align-items: center"
+              >
+                <img src="logomjs.png" style="width: 1em; margin: 0" />
+                meet.js Białystok
+              </div>
+              <div
+                class="fragment"
+                style="display: flex; gap: 0.2em; align-items: center"
+                data-fragment-index="3"
+              >
+                <img src="logo.png" style="width: 1em; margin: 0" />
+                Databricks
+              </div>
+            </div>
+            <img
+              src="download.jpeg"
+              data-fragment-index="1"
+              width="300"
+              class="fragment"
+              style="margin: 0"
+            />
+          </div>
+          <aside class="notes">
+            <li>nazywam sie hubert</li>
+            <li>w białymstoku meetjsy od 2015 roku</li>
+            <li>FRONTEND DEV W DATABRICKS!</li>
+            <li>
+              databricks - to jedna z takich śmiesznych firm że nie
+              słyszeliście, ale jesteście klientem firmy która jest naszym
+              klientem
+            </li>
+            <li>
+              data warehousy, lakes, przetwarzanie danych, machine learning
+            </li>
+            <li>eksabajty danych</li>
+            <li>apple, adobe, hp, toyota, siemens, cisco</li>
+            <li>
+              dużo klientów przetwarza u nas monitoring swoich stron - stąd też
+              dużo myślenia o tym i pomysł na prezentacje
+            </li>
+          </aside>
+        </section>
+        <section>
+          <section>
+            <span style="opacity: 0.15"
+              ><strong class="text-orange-300">JS</strong> jak JavaScript, </span
+            ><strong class="text-blue-300">O</strong> jak Observability
+            <aside class="notes">
+              <li>zanim pójdziemy dalej</li>
+              <li>OBSERVABILITY, MONITORING, bo o tym dzisiaj mowa</li>
+              <li>teraz by mi zdefiniować o czym mowa</li>
+              <li>my programiści kochamy definicje</li>
+              <li>lubimy definiować i lubimy się potem o to kłócić</li>
+              <li>
+                wrzucić programistom trudny temat np czy to jeszcze test e2eowy
+                czy integracyjny
+              </li>
+              <li>albo czy to framework czy biblioteka</li>
+              <li>przeciez to są rzeczy stworzone przez ludzi dla ludzi</li>
+              <li>a my zdefiniujmy sami</li>
+            </aside>
+          </section>
+          <section>
+            <div>Wypuszczamy aplikację na produkcję.</div>
+            <div>
+              Co <strike style="opacity: 0.3">chcemy</strike>musimy wiedzieć o
+              dalszych jej losach?
+            </div>
+
+            <aside class="notes">
+              <li>"Wypuszczamy aplikację na produkcję." DALEJ</li>
+              <li>czy działa</li>
+              <li>a co to znaczy</li>
+              <li>że userzy mogą klikać w featury</li>
+              <li>że te featury działają</li>
+              <li>że te featury działają szybko</li>
+              <li>że te featury są znajdowalne przez userów!</li>
+            </aside>
+          </section>
+
+          <section>
+            <p>Po pierwsze: <strong class="fragment">błędy</strong></p>
+            <aside class="notes">
+              <li>WAŻNE: Bez encyklopedycznej definicji.</li>
+              <li>CHCEMY wiedzieć czy są błędy</li>
+              zrobiliście aplikację, wiecie że jest bez błędów bo przecież
+              popisaliście testy, wysyłacie na produkcję. Checie słyszeć o
+              błędach? No nie. Ale wasz account już tak, bo jak błędy będą
+              krytyczne to on świeci oczami.
+            </aside>
+          </section>
+          <section>
+            <p>Po drugie: <strong class="fragment">wydajność</strong></p>
+            <aside class="notes">
+              <li>CHCEMY wiedzieć czy są szybko działa</li>
+              jak pisaliście apkę to przecież śmigała szybko. A nawet jak było
+              coś wolno to zoptymalizowaliście. Przeskanowaliście web vitals,
+              wszystko śmiga. To po co się tym przejmować jak jest szybko. Jak
+              coś wolno to wiadomo że to wina tych na backendzie. No ale
+              tworzyliście appkę na jakimś macbooku który ma 12 rdzeni i 32 gb
+              ramu bo wam firma kupiła. A user może mieć biurowy komputer na
+              przysłowiowy węgiel.
+            </aside>
+          </section>
+          <section>
+            <p>
+              Po trzecie: <strong class="fragment">analityka zdarzeń</strong>
+            </p>
+            <aside class="notes">
+              <li>CHCEMY wiedzieć gdzie klikają userzy</li>
+              czy potrzebujecie tego? Przecież UX/UI zaprojektował, narysował,
+              frontend jest postawiony wg designu. Potrzebujecie wiedzieć jak
+              userzy klikają w które przyciski etc.? Może tak, może nie, ale
+              dział produktowy potrzebuje wiedzieć czy zaprojektował interfejs
+              który jest jasny. Mógł zrobić testy UXowe z userami, ale to małą
+              skala. I kosztuje.
+            </aside>
+          </section>
+          <section>
+            <p>Okej, więc chcemy wiedzieć o produkcyjnych:</p>
+            <ul>
+              <li>błędach</li>
+              <li>wydajności</li>
+              <li>używalności</li>
+            </ul>
+          </section>
+          <section>
+            <p>A jak?</p>
+            <p class="fragment">Ręcznie 📞...</p>
+            <p class="fragment">...albo 🤖.</p>
+            <aside class="notes">
+              <li>Mamy wszystkie potrzebne narzędzia</li>
+              <li>
+                kod aplikacji sam automayucznie może zgłosić problemy lub status
+                aplikacji
+              </li>
+              <li>
+                user juz dawno wyraził wszystkie zgody na ciastka etc i pewnie
+                nawet tego nie czytał
+              </li>
+              <li>
+                ogólna utopijna myśl - znamy wszystkie błędy, znamy wydajość i
+                wiemy w co user klika, wiemy wszystko
+              </li>
+            </aside>
+          </section>
+          <section>
+            <p>Czemu takie rzeczy dopiero na produkcji?</p>
+            <aside class="notes">
+              <li>Czemu nie staging etc</li>
+              <li>Czemu nie sprawdzimy tego wcześniej</li>
+              <li>tylko teraz?</li>
+              <li>
+                observability pozwala nam robić (jedyne legalne) testy na
+                produkcji - z DUŻą ilością userów
+              </li>
+            </aside>
+          </section>
+          <section>
+            <p>Więc umówmy się (😉) że jest to:</p>
+            <ul class="fragment">
+              <li>Raportowanie błędów</li>
+              <li>Metryki wydajności</li>
+              <li>Analityka zdarzeń</li>
+            </ul>
+            <p class="fragment">...na środowisku produkcyjnym.</p>
+            <aside class="notes">
+              <li>
+                to jest robocza definicja na potrzeby prezentacji, wierzę mocno
+                że masa ludzi chciałaby to zdefiniować inaczej - bardzo chętnie
+                się o to podyskutuje ale po prezce :)
+              </li>
+            </aside>
+          </section>
+
+          <section>
+            <div>Z czego dziś:</div>
+            <ul class="fragment">
+              <li>Raportowanie błędów</li>
+              <li>Metryki wydajności</li>
+              <li style="opacity: 0.3">Analityka zdarzeń</li>
+            </ul>
+            <aside class="notes">
+              <li>
+                skupię się na pierwszych dwóch bo tu zaobserwowałem najwięcej
+                ciekawostek
+              </li>
+              <li>
+                o tym jak przygotować dobrze kod pod analyticsy - do tego są
+                tutoriale
+              </li>
+              <li>i raczej nie jest to rocket science</li>
+            </aside>
+          </section>
+
+          <section>
+            O czym NIE jest ta prezentacja?
+            <aside class="notes">
+              <li>RAZ</li>
+              <li>
+                nie będziemy omawiać jak zestawiać narzędzia - do tego są
+                tutoriale
+              </li>
+              <li>logrocket, datadog, sentry, grafana etc.</li>
+              <li>
+                może nawet na swoim backendzie macie customowe rozwiązanie etc.
+              </li>
+              <li>DWA</li>
+              <li>nie będę wam mówił ze warto</li>
+              <li>chociaż postaram się was przekonać</li>
+              <li>bo to troche jak prezka o tym żę warto pisać testy</li>
+            </aside>
+          </section>
+          <section>
+            <p>O czym jest ta prezentacja?</p>
+
+            <aside class="notes">
+              <li>nieważne jak zestawicie sobie zestaw do observability</li>
+              <li>
+                na co zwrócić uwagę JAKO FRONTEND, na jakie pułapki uważać
+              </li>
+              <li>parę trików i nowych tecnhologi</li>
+              <li>parę przemyśleń</li>
+              <li>i jak spojrzeć na temat trochę bardziej globalnie</li>
+              <li>czyli JAK PISAĆ APKI KTÓRE DA SIĘ OBSERWOWAĆ</li>
+              <li>
+                cel: jakaś checklista w głowie, jak bedzie chwila to sobie
+                spojrzycie na swój system i coś może porpawicie
+              </li>
+              <!--
+              <li>
+                problem: każdy z tych tematów to może być oddzielna prezka, no
+                ale...
+              </li> -->
+            </aside>
+          </section>
+        </section>
+
+        <section data-background="#d57b7b">
+          <section>
+            <p>Część I</p>
+            <p><strong>Błędy</strong></p>
+          </section>
+        </section>
+        <section data-background="#c6c6c6">
+          <section>
+            <p>Potrzebujemy?</p>
+            <aside class="notes">
+              <li>
+                Już rozmawialiśmy - wypuszczacie bezbłędne aplikacje? JAk tak to
+                nie słuchajcie ;d
+              </li>
+            </aside>
+          </section>
+          <section>
+            <p>Ok, błędy na produkcji są - to co z nimi? 🤔</p>
+            <ol>
+              <li class="fragment">Nic 👌</li>
+              <li class="fragment">
+                Ładny modal + <em>"Please contact support </em>🥺<em>"</em>
+              </li>
+              <li class="fragment">
+                <strong>Ładny modal + automatyczne raportowanie</strong>
+              </li>
+            </ol>
+            <aside class="notes">
+              <li>BANAŁ</li>
+              <li>1: nic nie robimy</li>
+              <li>2: wyświetlamy ładny modal + email</li>
+              <li>3: automatyzujemy</li>
+            </aside>
+          </section>
+
+          <section>
+            <p>Jak to może działać?</p>
+            <img src="img/sch/error.png" />
+          </section>
+          <section>
+            <p>Są błędy i błędy.</p>
+            <p>Które raportujemy?</p>
+            <aside class="notes">
+              <li>Te runtime - z naszej appki</li>
+              <li>Te z API - problem backendu? tak i nie</li>
+              <li>
+                może coś się wysypie w mikroserwisie bakendowym, może w bazie,
+                może w proxy, może w load balancerze
+              </li>
+              <li>ale to frontend się tego dowie bo userowi nie zadziała</li>
+              <li>TAKŻĘ CZEMU NIE RAPORTOWAĆ WSZYSTKIEGO?</li>
+            </aside>
+          </section>
+
+          <section>
+            <p>Jak?</p>
+            <ul>
+              <li class="fragment">
+                Gotowe narzędzia
+                <br /><small
+                  >(np. Datadog, Sentry, LogRocket, New Relic, etc.)</small
+                >
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <p>Przykład (Sentry)</p>
+            <center>
+              <img src="img/tools/sentry_embed.png" style="width:100%"" />
+            </center>
+          </section>
+          <section>
+            <img src="img/sch/error.png" />
+          </section>
+          <section>
+            <p>Przykład (Sentry)</p>
+            <center>
+              <img src="img/tools/sentry.jpg" />
+            </center>
+          </section>
+          <section>
+            <p>Przykład (LogRocket)</p>
+            <center>
+              <img src="img/tools/logrocket.png" />
+            </center>
+          </section>
+          <section>
+            <p>Jak?</p>
+            <ul>
+              <li style="opacity: 0.3">
+                Gotowe narzędzia
+                <br /><small
+                  >(np. Datadog, Sentry, LogRocket, New Relic, etc.)</small
+                >
+              </li>
+              <li>
+                Własne raportowanie: UI -> API -> baza danych + system do
+                przeglądania
+                <br /><small>(np. Grafana, JIRA?)</small>
+              </li>
+            </ul>
+          </section>
+          <section>
+            <p>Przykład - własny tooling</p>
+            <pre><code data-line-numbers="|3-7|11">// logErrorService.js
+
+const reportError = (error) => {
+  axios.post("/api/2.0/report-exception", {
+    error: JSON.stringify(error)
+  })
+}
+
+// someCodeFile.js
+
+try {...} catch (e) { reportError(e); }
+
+</code></pre>
+          </section>
+          <section>
+            <p>Przykład - własny tooling</p>
+            <pre><code data-line-numbers="|6-7">// errorService.ts
+
+export class ErrorController {
+  @Post()
+  report(@Body() reportErrorDto: ReportErrorDto): string {
+    // Myk do bazy danych
+    this.errorService.report(reportErrorDto);
+  }
+}
+</code></pre>
+          </section>
+          <section>
+            <p>Co dalej?</p>
+            <center><img src="img/sch/logs.png" width="100%"" /></center>
+          </section>
+          <section>
+            <center>
+              <div class="r-stack">
+                <img src="img/tools/grafana_log.png" width="100%" />
+                <img
+                  class="fragment"
+                  src="img/tools/grafana_dash.png"
+                  width="100%"
+                />
+              </div>
+            </center>
+          </section>
+          <section>
+            <p>Cel?</p>
+            <ul>
+              <li class="fragment">Możliwie szybka reprodukcja</li>
+              <li class="fragment">Alerting</li>
+              <li class="fragment">
+                Unikamy zawracania 🎸 userowi
+                <span class="fragment">(trochę)</span>
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <section data-background="#c6c6c6">
+          <section data-background="#c6c6c6">
+            <p>Pułapki i praktyki</p>
+          </section>
+          <section>
+            <p>Pułapka #1</p>
+            <p><strong>Logujemy za mało</strong></p>
+            <aside class="notes">
+              <li>to tylko na rozgrzewkę</li>
+              <li>TYCZY SIĘ PRZEDE WSZYSTKIM WŁASNYCH</li>
+              <li>ale nie tylko</li>
+            </aside>
+          </section>
+
+          <!-- <section>
+            <center>
+              <img src="img/bledy/weak_error.png" />
+            </center>
+          </section> -->
+
+          <section>
+            <p>Przykład: wyjątek asynchroniczny</p>
+            <pre><code data-line-numbers="1-11|13-21|18-21|4-8" data-trim>class ApiService {
+	async call() {
+		const response = await fetch("https://[...]");
+		if (!response.ok) {
+			return Promise.reject(new Error(
+        "Failed to fetch [URL]"
+      ));
+		}
+		return response.json();
+	}
+}
+
+function process() {
+	new ApiService().call()
+	  .then((data) => {
+		  // ...
+	  })
+	  .catch((error) => {
+      // Raportujemy błąd
+      reportError(error);
+	  });
+}
+  </code></pre>
+          </section>
+          <section>
+            <pre><code data-trim>
+              .catch((error) => {
+                console.log(error.stack);
+              });
+			  </code></pre>
+          </section>
+          <section>
+            <img src="img/bledy/1.png" width="100%"" />
+            <p class="fragment">Z grubsza wszystko co wiemy ☝️</p>
+            <p class="fragment">Jaki ticket z tego wyjdzie?</p>
+          </section>
+          <section>
+            <center>
+              <img
+                src="img/bledy/weak_error.png"
+                style="transform: scale(1.25)"
+              />
+            </center>
+          </section>
+          <section>
+            <h1>🫠</h1>
+          </section>
+          <section>
+            <p>Co pomoże?</p>
+            <ul>
+              <li class="fragment">Lepszy stack trace</li>
+              <li class="fragment">URL / historia URLi (route-ów)</li>
+              <li class="fragment"><code>navigator.*</code></li>
+            </ul>
+          </section>
+          <section>
+            <p>Stack trace - da się lepiej?</p>
+            <p class="fragment">
+              Powód problemu ze stackiem: kod asynchroniczny
+              <br />🤔
+            </p>
+          </section>
+
+          <section>
+            <pre><code data-line-numbers="2|3-6" data-trim>function process() {
+  const initiatorStack = new Error().stack;
+  new ApiService().call().catch((error) => {
+    console.log(error.stack);
+    console.log(initiatorStack);
+  });
+}
+
+document
+	.querySelector("button")
+	.addEventListener("click", () => {
+		process();
+	});
+</code></pre>
+          </section>
+          <section>
+            <center><img src="img/bledy/3.png" /></center>
+          </section>
+          <section>
+            <pre><code data-line-numbers="4-8" data-trim>function process() {
+  const initiatorStack = new Error().stack;
+  new ApiService().call().catch((error) => {
+    const completeStack = [
+      error.stack,
+      ...initiatorStack.split("\n").slice(1),
+    ].join("\n");
+    console.log(completeStack);
+  });
+}</code></pre>
+          </section>
+          <section>
+            <center><img src="img/bledy/4.png" /></center>
+          </section>
+          <section>
+            Trochę lepiej
+            <center>
+              <img
+                src="img/bledy/weak_error_b1.png"
+                style="width: 100%; transform: scale(1.2); margin-top: 1em"
+              />
+            </center>
+          </section>
+          <section>
+            Jeszcze lepiej
+            <center><img src="img/bledy/weak_error_b2.png" /></center>
+          </section>
+          <section>
+            <p>Co jeszcze pomoże?</p>
+            <ul>
+              <li class="fragment">odbitka feature flag</li>
+              <li class="fragment">ewaluacja A/B</li>
+              <li class="fragment">identyfikacja użytkownika</li>
+            </ul>
+          </section>
+          <section>
+            <center><img src="img/bledy/weak_error_b3.png" /></center>
+          </section>
+          <section>
+            <p>
+              Im szersze (💰) narzędzie, tym mniej będziecie się tym musieli
+              martwić
+            </p>
+          </section>
+          <section>
+            Nie logujmy za mało...
+            <aside class="notes">
+              Ogólnie ciężko zalogować za mało. To są lekkie i łatwe dane
+            </aside>
+          </section>
+        </section>
+        <section data-background="#c6c6c6">
+          <section>
+            <p>Pułapka #2</p>
+            <p><strong>Logujemy za dużo</strong></p>
+            <aside class="notes">
+              <li>można?</li>
+            </aside>
+          </section>
+          <section>
+            <img src="img/bledy/token_in_log.png" width="100%" />
+            <p>Ticket w systemie ☝️. Co tu jest nie tak?</p>
+          </section>
+          <section>
+            <img src="img/bledy/2.png" />
+            <p>A tu?</p>
+            <aside class="notes">
+              <li>
+                załóżmy że jest to ticket który wleciał z raportowania błędów
+              </li>
+              <li>account manager pinguje nas z tym błędem że OMG</li>
+              <li>
+                bierzemy ticket, patrzymy co się dzieje, próbujemy reprodukować
+              </li>
+              <li>
+                okazuje się że klient w polu tekstowym użył jakiegoś dziwnego
+                unicodowego zagranicznego znaczka
+              </li>
+              <li>i że naprawicie, ale że na razie to nie wolmo</li>
+              <li>
+                account bierze ticket i pisze zadowolony maila klientowi że ten
+                jego MERGE AND ACQUISITION to będzie naprawiony
+              </li>
+              <li>
+                klient też jest zadowolony, czyta maila i dzwoni do prawnika
+              </li>
+            </aside>
+          </section>
+
+          <section>
+            <p>Konstruując błędy, raporty, logi:</p>
+            <p class="fragment">✂️</p>
+            <aside class="notes">
+              <li>Zwyczajowo wycinamy dane użytkownika</li>
+              <li>Wystarczą: identyfikatory, URLe</li>
+              <li>Wycinajmy tokeny, klucze, hasła etc.</li>
+              <li>Im mniej danych użytkownika tym lepiej</li>
+              <li>W jego bazie danych</li>
+              <li>A skoro o userze mowa</li>
+            </aside>
+          </section>
+        </section>
+        <section data-background="#c6c6c6">
+          <section>
+            <p>
+              <strong>Czy to grzech wspomóc się użytkownikiem?</strong>
+            </p>
+            <aside class="notes">
+              <li>ok, mieliśmy mu nie zawracać gitary</li>
+              <li>i robimy system który sam będzie zgłaszał</li>
+              <li>ale czemu ładnie nie spytać</li>
+            </aside>
+          </section>
+          <section><img src="img/bledy/5.png" width="100%" /></section>
+          <section>
+            <p>Cel?</p>
+            <li class="fragment">Możliwie szybka reprodukcja</li>
+          </section>
+          <section><img src="img/bledy/6.png" width="100%" /></section>
+          <section>
+            <h3 style="text-transform: none">Obserwacja (*)</h3>
+            <p>
+              Użytkownicy częściej niż nam się wydaje podają kontekst/dodatkowe
+              dane.
+            </p>
+            <p class="fragment">
+              <strong>Użytkownicy płacący jeszcze częściej.</strong>
+            </p>
+          </section>
+          <section>
+            <p>Czy można lepiej?</p>
+            <p class="fragment">A zrzut ekranu? 🤔</p>
+          </section>
+          <section>
+            <pre><code data-trim data-line-numbers="|2-6|8-12|14-21">async function snapshot() {
+  const stream = await navigator.mediaDevices
+    .getDisplayMedia({
+      preferCurrentTab: true,
+    });
+  const [track] = stream.getVideoTracks();
+
+  const canvas = document.createElement("canvas");
+  const video = document.createElement("video");
+  video.srcObject = stream;
+
+  await video.play();
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+
+  canvas.toBlob((blob) => {
+    track.stop();
+    // Przetworzenie + wysłanie bloba
+  });
+}
+</code></pre>
+          </section>
+          <section><img src="img/bledy/7.png" width="100%" /></section>
+          <section>Z autopsji: ☝️ mocno pomogło lokalizować błędy</section>
+        </section>
+        <section data-background="#c6c6c6">
+          <!-- <section>
+            <p>Co jeszcze?</p>
+            <aside class="notes"></aside>
+          </section> -->
+          <!-- <section>
+            <center class="r-stack">
+              <img src="img/bledy/boundary1.png" />
+              <img class="fragment" src="img/bledy/boundary2.png" />
+            </center>
+          </section> -->
+          <!--
+          <section data-background="white">
+            <img src="img/bledy/toomuch_1.png" />
+          </section>
+
+          <section data-background="white">
+            <center>
+              <img src="img/bledy/toomuch_2.png" width="50%" />
+            </center>
+          </section>
+          <section>
+            <p>Dziel i rządź:</p>
+            <p>granice błędów w aplikacji</p>
+            <aside class="notes"></aside>
+          </section> -->
+          <!-- <section>
+            <pre style="width: 100%"><code>
+              <script type="text/template">function Root() {
+  return (
+    <Routes>
+      <Route path="/companies/*" element={<CompaniesRoutes />} />
+      <Route path="/users/*" element={<UsersRoutes />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="*" element={<div>404</div>} />
+    </Routes>
+  );
+}</script></code></pre>
+
+            <pre style="width: 100%"><code>
+              <script type="text/template">function CompaniesRoutes() {
+  return (
+    <Routes>
+      <Route path="/:companyId" element={<CompanyDetails />} />
+      <Route path="/new" element={<CompanyNew />} />
+    </Routes>
+  );
+}</script></code></pre>
+          </section> -->
+          <!-- <section>
+            <center class="r-stack">
+              <img src="img/bledy/boundary1.png" />
+              <img class="fragment" src="img/bledy/boundary2.png" />
+            </center>
+          </section> -->
+          <!-- <section>
+            <pre style="width: 100%"><code data-line-numbers="3,8">
+              <script type="text/template">function CompaniesRoutes() {
+  return (
+    <AppErrorBoundary boundaryId="COMPANIES">
+      <Routes>
+        <Route path="/:companyId" element={<CompanyDetails />} />
+        <Route path="/new" element={<CompanyNew />} />
+      </Routes>
+    </AppErrorBoundary>
+  );
+}</script></code></pre>
+            <pre style="width: 100%"><code>
+  <script type="text/template">// ...
+  const { boundaryId } = useAppErrorBoundary();
+  const onError = (error) => reportError(error, { boundaryId });
+// ...</script></code></pre>
+            <aside class="notes">react-error-boundary</aside>
+          </section> -->
+          <section>
+            <p>Co jeszcze?</p>
+            <p class="fragment">Niespójna struktura wyjątków</p>
+            <aside class="notes"></aside>
+          </section>
+          <section>
+            <pre><code data-trim data-line-numbers="1-13|15-18|20-23|25-30">
+class ErrorWrapper extends Error {
+  constructor(
+    private error: string,
+    private errorCode: number,
+    private stackTrace = new Error().stack
+  ) {
+    super(error);
+  }
+  serialize() {
+    const { error, stackTrace, errorCode } = this;
+    return { error, stackTrace, errorCode };
+  }
+}
+
+function akcja1() {
+  // ...
+  reportError(new ErrorWrapper("Unauthorized", 401));
+}
+
+function akcja2() {
+  // ...
+  reportError({ code: 401, message: "Unauthorized" });
+}
+
+function akcja3() {
+  // ...
+  reportError({ 
+    error: JSON.stringify({
+      code: 401, message: "Unauthorized"
+    })
+  })
+}
+            </code></pre>
+          </section>
+        </section>
+        <section data-background="#c6c6c6">
+          <section>
+            <p>Jeszcze jedna pułapka...</p>
+            <p class="fragment">
+              <strong>Co jeśli logi nie przychodzą?</strong>
+            </p>
+            <aside class="notes">
+              <li>odpalacie system, stawiacie sentry czy coś tam</li>
+              <li>i nie ma błędów</li>
+              <li>...i nie ma błędów</li>
+              <li>to dobrze, prawda?</li>
+              <li>warto napisać test który zmockowane</li>
+            </aside>
+          </section>
+          <section>
+            <h1>🥸</h1>
+            <aside class="notes">
+              <li>
+                a bardziej warto napisać e2e który będzie siedział w waszym CI i
+                raz na miesiąc faktycznie wysypie stronę i zgłosi faktyczny
+                raport
+              </li>
+            </aside>
+          </section>
+        </section>
+
+        <section data-background="#c6c6c6">
+          <p>Błędy - podsumowanie</p>
+          <ul>
+            <li class="fragment">Logujmy sporo...</li>
+            <li class="fragment">...ale nie za dużo</li>
+            <li class="fragment">Jakość stack trace'ów ✨</li>
+            <li class="fragment">Spójna forma</li>
+            <li class="fragment">Testujmy!</li>
+          </ul>
+        </section>
+        <section data-background="#3c3355">
+          <section>
+            <p>Część II</p>
+            <p><strong>Wydajność</strong></p>
+          </section>
+          <section>
+            <p>Dlaczego?</p>
+            <aside class="notes">
+              <li>Znowu - problem macbooka programisty</li>
+              <li>
+                Celem jest by appka była szybka/używalna przez wszystkich na
+                większości maszyn
+              </li>
+              <li>(chyba że nie, ale to dziwny model biznesowy)</li>
+            </aside>
+          </section>
+          <section>
+            <p><em>"Czy aplikacja jest wystarczająco szybka"</em></p>
+            <p class="fragment">Jak na to odpowiedzieć?</p>
+          </section>
+          <section>
+            <p>Możemy zmierzyć:</p>
+            <ul>
+              <li class="fragment">Wąskie gardła, blokujące taski</li>
+              <li class="fragment">Czas renderu kawałków UI (tabelka etc.)</li>
+              <li class="fragment">Wielkość pobieranych danych</li>
+            </ul>
+            <p class="fragment">Jak?</p>
+            <ul>
+              <li class="fragment">
+                Dynamicznie (<code>performance.now()</code>, Cypress)
+              </li>
+              <li class="fragment">Statycznie (Lighthouse etc.)</li>
+            </ul>
+            <p class="fragment">Często to koniec 🏁</p>
+          </section>
+          <section>
+            Czy to wystarczy do odpowiedzi na pytanie? ☝️
+            <aside class="notes">
+              <li>"Czy aplikacja jest wystarczająco szybka"</li>
+              <li>Może odpowiada, ale dość subiektywnie</li>
+            </aside>
+          </section>
+        </section>
+        <section data-background="#3c3355">
+          <section>
+            <p>
+              Co <strike style="opacity: 0.25">użytkownika</strike>nas tak
+              naprawdę interesuje?
+            </p>
+            <!-- <p class="fragment">A gdyby tak E2E?</p> -->
+            <aside class="notes">
+              <li>Co tak naprawdę nas interesuje?</li>
+              <li>
+                MOŻEMY Czas responsów z API. Wiecie, jak za długie to problem bo
+                też apka wolno działa. Ale to problem backendu, infry od
+                networku, chmurowców - każdy zmierzy po swojemu.
+              </li>
+              <li>MOŻEMY czas ekranów</li>
+              <li>MOŻEMY zasoby</li>
+              <li>
+                Ale my na frontendzie mamy wyjątkową, w zasadzie najlepszą
+                pozycję do mierzenia
+              </li>
+              <li>WSZYSTKIEGO</li>
+              <li>JAKI INNY AKTOR potrafi zebrtać tak dane</li>
+            </aside>
+          </section>
+          <section>
+            <center><img src="img/sch/perf.png" /></center>
+            <aside class="notes">
+              <li>CO INTERESUJE USERA</li>
+              <li>Start jakiejś akcji (INTERAKCJI) - nawigacja, klik etc</li>
+              <li>Coś się dzieje.</li>
+              <li>Może to być ładowanie strony</li>
+              <li>Może to być ładowanie kolejnej strony czyli nawigacja</li>
+              <li>
+                Może to być akcja która odzywa się do API i coś przetwarza
+              </li>
+              <li>Co interesuje userów? Kiedy mogą robić dalej</li>
+              <li>OD kiedy może coś robić do kiedy moze coś robić</li>
+            </aside>
+          </section>
+          <section>
+            <ul>
+              <li>
+                Start:<br />
+                <strong
+                  >otwarcie aplikacji, nawigacja, akcja użytkownika</strong
+                >
+              </li>
+              <br />
+              <li>Koniec:<br /><strong>interaktywność?</strong></li>
+            </ul>
+          </section>
+          <section>I to można też mierzyć i monitorować</section>
+          <section>
+            <p>Jak można działać:</p>
+            <ul>
+              <li class="fragment">
+                Zdefiniowanie/nazwanie każdej scenariusza (interakcji, UJ, ...)
+              </li>
+              <li class="fragment">
+                Start pomiaru: zabieramy użytkownikowi wolność
+              </li>
+              <li class="fragment">Koniec pomiaru: zwracamy ją z powrotem</li>
+            </ul>
+          </section>
+          <section>
+            <p>Pomysły na implementację?</p>
+            <ul>
+              <li class="fragment">
+                Rozpoczynanie interakcji przy nawigacji (nasłuch na routerze)
+              </li>
+              <li class="fragment">
+                Rozpoczynanie interakcji na żądanie (zdarzenie na elemencie)
+              </li>
+              <li class="fragment">...zależnie od frameworka</li>
+            </ul>
+          </section>
+
+          <section>
+            <pre><code data-line-numbers="4-7"><script type="text/template">const Routes = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const interaction = getInteraction(location.path);
+    startInteraction(location.path);
+  }, [location])
+  
+  return (
+    <Routes>
+      <Route path="/tables" element={...} />
+      <Route path="/users" element={...} />
+    </Routes>
+  );
+}
+
+</script></code></pre>
+          </section>
+          <section>
+            <pre><code data-line-numbers="2-5,10"><script type="text/template">const View = () => {
+  const loadUsers = useCallback(() => {
+    startInteraction('LOADING_USERS');
+    fetchUsersFromApi(...);
+  }, [])
+  
+  return (
+    <div>
+      {/* ... */}
+      <button onClick={loadUsers}>Load</button>
+    </div>
+  );
+}
+
+</script></code></pre>
+          </section>
+
+          <section>
+            <pre><code data-line-numbers="9-14"><script type="text/template">const View = () => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  
+  useEffect(... => ...)
+  
+  return (
+    <div>
+      <InteractionBlock
+        name="PAGE_CLIENTS_TABLE_VIEW" 
+        isBlocked={loading}
+      >
+        {loading ? <Spinner /> : data.map(... => ...)}
+      </Interation>
+    </div>
+  );
+}
+
+</script></code></pre>
+          </section>
+
+          <section>
+            <pre><code data-line-numbers="10-14"><script type="text/template"><div class="feed-toggle">
+  <ul class="nav nav-pills outline-active">
+    
+    <li [hidden]="!listConfig.filters.tag">
+      <a class="nav-link active">
+        {{ listConfig.filters.tag }}
+      </a>
+    </li>
+  </ul>
+  <interaction-pending
+    name="CLIENT_TABLE_LOADING"
+    [loading]="loading"
+  >
+  </interaction-pending>
+</div></script></code></pre>
+          </section>
+
+          <section>
+            <p>A kiedy skończyć pomiar?</p>
+            <p class="fragment" data-fragment-index="1">
+              Podpowiedź: interaktywność
+            </p>
+            <h1 class="fragment" data-fragment-index="1">🤔</h1>
+          </section>
+          <section>
+            <pre><code><script type="text/template">requestAnimationFrame(() => {
+  // Odblokowanie
+});</script></code></pre>
+          </section>
+          <section>
+            <pre><code><script type="text/template">requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    // Odblokowanie
+  });
+});</script></code></pre>
+            <small style="font-size: 0.4em">
+              https://medium.com/@paul_irish/requestanimationframe-scheduling-for-nerds-9c57f7438ef4
+            </small>
+            <aside class="notes">
+              <li>
+                pierwszy rAF moze jeszcze wykonac się w tej samej ramce
+                wykonania
+              </li>
+              <li>zagnieżdżony będzie na bank w kolejnej</li>
+            </aside>
+          </section>
+          <section>
+            <center><img src="img/sch/perf.png" /></center>
+            <aside class="notes">
+              <li>Z autopsji: ☝️ działa całkiem nieźle</li>
+            </aside>
+          </section>
+          <section>
+            <pre
+              style="width: 100%"
+            ><code data-line-numbers><script type="text/template">interactionTracker.onInteractionFinish((interaction) => {
+  axios.post("/api/2.0/report-performance", { interaction })
+});</script></code></pre>
+            <pre
+              style="width: 100%"
+            ><code data-line-numbers><script type="text/template">export class PerformanceController {
+  @Post()
+  report(@Body() reportDto: ReportDto): string {
+    // Myk do bazy danych
+    this.performanceService.report(reportDto);
+  }
+}
+</script></code></pre>
+            <div
+              class="fragment"
+              style="
+                background-color: white;
+                text-align: center;
+
+                padding: 0.5em;
+              "
+            >
+              <center>
+                <img src="img/sch/logs.png" style="height: 5em" />
+              </center>
+            </div>
+          </section>
+          <section>
+            <center>
+              <img src="img/perf/grafana_perf_log.png" />
+            </center>
+          </section>
+          <section>
+            <center>
+              <img src="img/perf/grafana_perf_graph.png" />
+            </center>
+          </section>
+        </section>
+        <section data-background="#3c3355">
+          <section>
+            <p>Nie ma ogółu bez szczegółu</p>
+            <ul>
+              <li class="fragment">Wąskie gardła</li>
+              <li class="fragment">Ilość zasobów</li>
+            </ul>
+          </section>
+          <section>
+            <p>Wąskie gardła</p>
+            <ul>
+              <li class="fragment" data-fragment-index="1">
+                Możemy dłubać ręcznie
+              </li>
+              <li
+                class="fragment"
+                data-fragment-index="1"
+                style="font-size: 0.5em; margin-left: 1em"
+              >
+                <code>performance.now()</code>
+              </li>
+              <li class="fragment" data-fragment-index="2">
+                ...<code>PerformanceObserver</code>
+              </li>
+            </ul>
+          </section>
+          <section>
+            <pre><code data-line-numbers>const observer = new PerformanceObserver(...);
+
+observer.observe({
+  type: "longtask",
+});
+            </code></pre>
+          </section>
+          <section>
+            <pre><code data-trim data-line-numbers="|1-3|5-7|9-15"><script type="text/template">const observer = new PerformanceObserver((list) => {
+  console.log(list.getEntries()[0]);
+});
+
+observer.observe({
+  type: "longtask",
+});
+
+setTimeout(() => {
+  for (let i = 0; i < 500; i++) {
+    for (let j = 0; j < 500; j++) {
+      document.querySelector("div").innerHTML = "x";
+    }
+  }
+}, 1000);
+            </script></code></pre>
+          </section>
+          <section>
+            <img src="img/perf/1.png" width="100%" />
+          </section>
+          <section>
+            <pre><code data-trim data-line-numbers="7-16|14"><script type="text/template">
+const observer = new PerformanceObserver((list) => {
+  for (const item of list.getEntries()) {
+    console.log(item);
+  }
+});
+
+observer.observe({
+  entryTypes: [
+    "mark",
+    "measure",
+    "longtask",
+    "paint",
+    "navigation",
+    "resource",
+  ],
+});
+            </script></code></pre>
+          </section>
+          <section>
+            <img src="img/perf/2.png" width="100%" />
+          </section>
+          <section>
+            <img src="img/perf/3.png" width="100%" />
+          </section>
+          <section>
+            Jak to wygląda w całości?
+            <aside class="notes">
+              Mamy super raport: przy otwarciu strony XYZ zajęło to tyle i tyle
+              czasu, wystąpiły wąskie gardła (long taski) i poszło 4621 bajtów
+              danych
+            </aside>
+          </section>
+        </section>
+        <section data-background="#3c3355">
+          <section>
+            <p>Pułapka</p>
+            <p class="fragment"><strong>Pomiar wpływa na pomiar</strong></p>
+          </section>
+          <section>
+            <div>Jak to rozwiązać?</div>
+            <ul>
+              <li class="fragment">Kolejkowanie</li>
+              <li class="fragment">Sampling</li>
+            </ul>
+          </section>
+        </section>
+
+        <section data-background="#3c3355">
+          <p>Podsumowanie części wydajności</p>
+          <ul>
+            <li class="fragment">Pomiary E2E</li>
+
+            <small
+              ><li class="fragment" style="margin-left: 1em">
+                (+ wąskie gardła)
+              </li>
+              <li class="fragment" style="margin-left: 1em">(+ zasoby)</li>
+              <li class="fragment" style="margin-left: 1em">
+                (+ dodatkowe metadane)
+              </li></small
+            >
+
+            <li class="fragment"><code>PerformanceObserver</code></li>
+            <li class="fragment">Organizacja interakcji</li>
+          </ul>
+        </section>
+        <section data-background="#185642">
+          <section>
+            <p>Jak to wszystko ląduje w jednym wiaderku?</p>
+            <h1>🪣</h1>
+          </section>
+          <section>
+            <h4 style="text-transform: none">Mówiliśmy o:</h4>
+            <div class="r-stack">
+              <ul class="fragment">
+                <li>Raportowanie błędów</li>
+                <li>Metryki wydajności</li>
+                <li style="opacity: 0.5">Analityka zdarzeń</li>
+              </ul>
+              <ul class="fragment">
+                <li>Raportowanie błędów</li>
+                <li>Metryki wydajności</li>
+                <li style="color: greenyellow">Analityka zdarzeń</li>
+              </ul>
+            </div>
+            <aside class="notes">
+              <li>1. Doczepiamy raport z performancu do raportu błędu</li>
+            </aside>
+            <aside class="notes"><li>MIELIŚMY NIE RUSZAĆ ALE</li></aside>
+          </section>
+          <section>
+            <p>Czy zrobimy to sami...</p>
+            <pre><code data-line-numbers="|7-9|2-4">const reportClick = (event) => {
+  axios.post("/api/report-event", {
+    event: serializeEvent(event)
+  });
+}
+
+document.addEventListener('click', (e) => {
+  reportClick(e);
+});
+</code></pre>
+          </section>
+          <section>
+            <p>...czy zrobi to za nas Google Analytics...</p>
+            <pre><code data-line-numbers><script type="text/template">window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-XXXXXXX');
+            </script></code></pre>
+          </section>
+          <section data-background="#74c9ad">
+            <img src="img/sch/logs-compl1.png" width="100%" />
+          </section>
+          <section>
+            <p>I co z tego? 🤨</p>
+          </section>
+          <section data-background="#74c9ad">
+            <div class="r-stack">
+              <img src="img/sch/logs-compl1.png" width="100%" />
+              <img
+                class="fragment"
+                src="img/sch/logs-compl2.png"
+                width="100%"
+              />
+            </div>
+            <aside class="notes">
+              <li>Kiedyś klikało się filtry i pisało algorytmy</li>
+              <li>
+                piszemy jakieś skomplikowane querysy do bazy - czy użytkownicy
+                którym dłużej ładuje się strona częściej odchodzą
+              </li>
+              <li>
+                Teraz mając ten ogrom kompletnych danych o aplikacji (a przy
+                dużej aplikacji mówimy o miliardach wpisów)
+              </li>
+              <li>Możemy pójść krok dalej</li>
+              <li>i wpuścić je wszystkie do klastra ML</li>
+              <li>
+                Po czym uruchomić szukanie korelacji, kojarzenie i predykcji
+              </li>
+            </aside>
+          </section>
+          <section>
+            <p>Co możemy mieć?</p>
+            <ul>
+              <li class="fragment" style="margin-bottom: 1em">
+                Identyfikacja defektywnych obszarów aplikacji
+              </li>
+              <li class="fragment" style="margin-bottom: 1em">
+                Przewidywanie rezygnacji<span class="fragment"
+                  >, identyfikacja skali rażenia błędów</span
+                >
+              </li>
+              <li class="fragment" style="margin-bottom: 1em">
+                Optymalizacja wydajności (np. przy segmentacji geograficznej)
+              </li>
+
+              <aside class="notes">
+                <li>
+                  1 z historycznych danych wynika że najdłużej trwają interakcje
+                  z tego modułu? może trzeba zajrzeć w silnik tabelek?
+                </li>
+                <li>
+                  1 a może wciaż powtarzają się tam błędy 503, może trzeba
+                  zajrzeć w proxy wokół tego mikroserwisu? (w końćy mamy E2E)
+                </li>
+                <li>
+                  2 może błąd był błahy z raportu i niekrytyczny, ale z jakiegoś
+                  powodu po jego wystąpieniu userzy przestają korzystać? może to
+                  słaba wydajność powodują że userzy odchodzą? a może ilość
+                  błędów?
+                </li>
+                <li>
+                  3 z takich metryk może nam wyjść że akurat nie tylko responsy
+                  z networku, ale całe interakcje trwają najdłużej dla grupy z
+                  azji środkowej - trzeba dorzucić do pieca
+                </li>
+              </aside>
+            </ul>
+          </section>
+          <section data-transition="fade">
+            <p>Co możemy mieć?</p>
+            <ul style="font-size: 0.8em">
+              <li>Identyfikacja defektywnych obszarów aplikacji</li>
+              <li>
+                Przewidywanie rezygnacji, dentyfikacja skali rażenia błędów
+              </li>
+              <li>
+                Optymalizacja wydajności (np. przy segmentacji geograficznej)
+              </li>
+
+              <li class="fragment" style="opacity: 0.9">
+                Predykcja skalowania aplikacji
+              </li>
+
+              <li class="fragment" style="opacity: 0.75">
+                Optymalizacja cache'u
+              </li>
+
+              <li class="fragment" style="opacity: 0.6">
+                Automatyczna priorytyzacja błędów
+              </li>
+              <li class="fragment" style="opacity: 0.55">
+                Znajdowanie trendów błędów przy optymalizacji
+              </li>
+              <li class="fragment" style="opacity: 0.4">
+                Tuning load balancingu
+              </li>
+              <li class="fragment" style="opacity: 0.25">
+                Identyfikacja najlepszych metryk
+              </li>
+              <li class="fragment" style="opacity: 0.1">...</li>
+            </ul>
+          </section>
+          <section>
+            <p>Odpowiedzi na te i 1001 innych pytań</p>
+            <p class="fragment">
+              ...będą tak dobre, jak dobre będą dane które dostarczymy
+            </p>
+          </section>
+          <section>
+            <p>Nowy system do obserwowania/monitoringu?</p>
+            <ul style="list-style-type: none">
+              <li class="fragment">✅ Zbieranie kompletnych raportów błędów</li>
+              <li class="fragment">✅ Struktura, podział, konsekwencja</li>
+              <li class="fragment">✅ Kompletne raportowanie wydajności</li>
+            </ul>
+            <div class="fragment">
+              <p style="margin-top: 1em">
+                Posiadasz system do obserwowania/monitoringu?
+              </p>
+              <ul style="list-style-type: none">
+                <li>✅ Zajrzyj tam czasem 😉</li>
+              </ul>
+            </div>
+          </section>
+          <section>
+            <div>Dzięki! 🙌</div>
+            <div
+              class="fragment"
+              data-fragment-index="1"
+              style="margin-top: 1em; font-size: 0.8em"
+            >
+              github.com/hzub
+            </div>
+            <div
+              class="fragment"
+              data-fragment-index="1"
+              style="margin-bottom: 1em; font-size: 0.8em"
+            >
+              hubertzub.com
+            </div>
+            <div class="fragment" data-fragment-index="2">
+              Idźcie i obserwujcie! 👋
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // More info about initialization & config:
+      // - https://revealjs.com/initialization/
+      // - https://revealjs.com/config/
+      Reveal.initialize({
+        hash: true,
+
+        navigationMode: "linear",
+        highlight: {
+          // beforeHighlight: (hljs) => hljs.registerLanguage("asdf"),
+        },
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+      });
+      Reveal.configure({
+        pdfSeparateFragments: false,
+      });
+    </script>
+  </body>
+</html>

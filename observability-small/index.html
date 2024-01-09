@@ -134,17 +134,11 @@
             <p><strong>Grzeszek-banał #1</strong></p>
             <p>Nie raportujemy wszystkiego co mamy</p>
           </section>
-          <section>
-            <p>
-              Założenie: mamy <em>jakiś</em> system który raportuje do chmury
-              wszystkie wyjątki w aplikacji
-            </p>
-            <!-- <img src="img/sch/error.png" /> -->
-          </section>
-          <section>
+
+          <!-- <section>
             <p>Cel?</p>
             <p>Możliwie szybka reprodukcja 🐇 i naprawa</p>
-          </section>
+          </section> -->
           <section>
             <center>
               <img src="img/bledy/report.png" width="100%" />
@@ -406,11 +400,11 @@
           </section> -->
           <section>
             <p><strong>Grzeszek #3</strong></p>
-            <p>Niespójna struktura wyjątków</p>
+            <p>Niespójny kod wyjątków</p>
             <aside class="notes"></aside>
           </section>
           <section>
-            <pre><code data-trim data-line-numbers="1-13|15-18|20-23|25-30">
+            <pre><code data-trim data-line-numbers="15-18|20-23|25-30">
 class ErrorWrapper extends Error {
   constructor(
     private error: string,
@@ -487,7 +481,7 @@ function akcja3() {
             <p>🤔</p>
           </section>
           <section>
-            <p>Klasycznie w monitoringu mierzymy i zbieramy:</p>
+            <p>Klasycznie (*) ze strony UI zbieramy i mierzymy:</p>
             <ul>
               <li>Czas odpowiedzi z API</li>
               <li>Wielkość pobieranych danych</li>
@@ -500,20 +494,49 @@ function akcja3() {
               </li>
               <li class="fragment">Statycznie (Lighthouse etc.)</li>
             </ul> -->
-            <p class="fragment">Wystarczy?</p>
-          </section>
-          <section>
-            <p>
-              Efekt: luźne dane które musimy przetworzyć, przeanalizować,
-              skorelować
-            </p>
-            <p>⬇</p>
-            <p>Ryzyko błędnych założeń</p>
           </section>
           <section>
             <p><strong>Grzeszek #5</strong></p>
+            <p>Pomiarem wpływasz na pomiar</p>
+          </section>
+
+          <section>
+            <div>Jak to rozwiązać?</div>
+            <ul>
+              <li class="fragment">
+                Banał: blokujące taski/kolejkowanie/async
+              </li>
+              <li class="fragment">Sampling</li>
+            </ul>
+          </section>
+
+          <section>
+            <p><strong>Grzeszek #6</strong></p>
             <p>Nie mierzymy wydajności z punktu widzenia użytkownika</p>
           </section>
+
+          <section>
+            <p>Jeszcze raz, zbieramy/mierzymy:</p>
+            <ul>
+              <li>Czas odpowiedzi z API</li>
+              <li>Wielkość zasobów</li>
+              <li>Wąskie gardła w UI, blokujące taski</li>
+            </ul>
+          </section>
+          <section>
+            <p>
+              Problem: masa luźnych danych które trzeba przetworzyć i skorelować
+            </p>
+            <p class="fragment" data-fragment-index="1">⬇</p>
+            <p class="fragment" data-fragment-index="1">
+              Ryzyko błędnych założeń
+            </p>
+            <p class="fragment" data-fragment-index="1">⬇</p>
+            <p class="fragment" data-fragment-index="1">
+              "Które fragmenty aplikacji są szybkie a które nie?"
+            </p>
+          </section>
+
           <section>
             <p>Można lepiej?</p>
           </section>
@@ -572,11 +595,11 @@ function akcja3() {
           <section>
             <p>Jak można mierzyć lepiej:</p>
             <ul>
-              <li>
-                Zdefiniowanie/nazwanie każdej scenariusza (interakcji, UJ, ...)
-              </li>
+              <li style="margin-bottom: 1em">Definicja scenariuszy</li>
               <li>Start pomiaru: zabieramy użytkownikowi wolność</li>
-              <li>Koniec pomiaru: zwracamy ją z powrotem</li>
+              <li style="margin-bottom: 1em">
+                Koniec pomiaru: zwracamy ją z powrotem
+              </li>
               <li>
                 <strong
                   >+ zbieramy wszystko co pomiędzy (czasy odpowiedzi API,
@@ -588,7 +611,7 @@ function akcja3() {
           <section>
             <p>Efekt:</p>
             <ul>
-              Skorelowane, kompletne dane
+              Skorelowane, kompletne dane o wydajności części aplikacji
             </ul>
           </section>
           <!-- <section>
@@ -602,25 +625,10 @@ function akcja3() {
             </ul>
           </section> -->
           <section>
-            <p>Pomysły na implementację?</p>
+            <p>Pomysły na implementację w UI?</p>
             <ul>
               <li>Zależnie od biblioteki/frameworka</li>
               <li>Nielichy temat, chętnie o tym pogadam 🍻</li>
-            </ul>
-          </section>
-
-          <section>
-            <p><strong>Grzeszek #6</strong></p>
-            <p>Pomiarem wpływasz na pomiar</p>
-          </section>
-
-          <section>
-            <div>Jak to rozwiązać?</div>
-            <ul>
-              <li class="fragment">
-                Banał: blokujące taski/kolejkowanie/async
-              </li>
-              <li class="fragment">Sampling</li>
             </ul>
           </section>
         </section>
@@ -636,7 +644,7 @@ function akcja3() {
             Często jest tak:
             <ul>
               <li>Świat #1: monitoring błędów, wydajności</li>
-              <li>Świat #2: user analytics</li>
+              <li>Świat #2: analityka użycia (np. Google Analytics etc)</li>
             </ul>
           </section>
           <!-- <section>
@@ -688,40 +696,7 @@ function akcja3() {
               </li>
             </aside>
           </section>
-          <section>
-            <p>Co możemy mieć?</p>
-            <ul>
-              <li style="margin-bottom: 1em">
-                Identyfikacja defektywnych obszarów aplikacji
-              </li>
-              <li style="margin-bottom: 1em">Przewidywanie rezygnacji</li>
-              <li style="margin-bottom: 1em">
-                Optymalizacja wydajności (np. przy segmentacji geograficznej)
-              </li>
 
-              <aside class="notes">
-                <li>
-                  1 z historycznych danych wynika że najdłużej trwają interakcje
-                  z tego modułu? może trzeba zajrzeć w silnik tabelek?
-                </li>
-                <li>
-                  1 a może wciaż powtarzają się tam błędy 503, może trzeba
-                  zajrzeć w proxy wokół tego mikroserwisu? (w końćy mamy E2E)
-                </li>
-                <li>
-                  2 może błąd był błahy z raportu i niekrytyczny, ale z jakiegoś
-                  powodu po jego wystąpieniu userzy przestają korzystać? może to
-                  słaba wydajność powodują że userzy odchodzą? a może ilość
-                  błędów?
-                </li>
-                <li>
-                  3 z takich metryk może nam wyjść że akurat nie tylko responsy
-                  z networku, ale całe interakcje trwają najdłużej dla grupy z
-                  azji środkowej - trzeba dorzucić do pieca
-                </li>
-              </aside>
-            </ul>
-          </section>
           <section>
             <p>Co możemy mieć?</p>
             <ul style="font-size: 0.8em">
@@ -733,17 +708,41 @@ function akcja3() {
                 Optymalizacja wydajności (np. przy segmentacji geograficznej)
               </li>
 
-              <li style="opacity: 0.9">Predykcja skalowania aplikacji</li>
+              <li class="fragment" data-fragment-index="1" style="opacity: 0.9">
+                Predykcja skalowania aplikacji
+              </li>
 
-              <li style="opacity: 0.75">Optymalizacja cache'u</li>
+              <li
+                class="fragment"
+                data-fragment-index="1"
+                style="opacity: 0.75"
+              >
+                Optymalizacja cache'u
+              </li>
 
-              <li style="opacity: 0.6">Automatyczna priorytyzacja błędów</li>
-              <li style="opacity: 0.55">
+              <li class="fragment" data-fragment-index="1" style="opacity: 0.6">
+                Automatyczna priorytyzacja błędów
+              </li>
+              <li
+                class="fragment"
+                data-fragment-index="1"
+                style="opacity: 0.55"
+              >
                 Znajdowanie trendów błędów przy optymalizacji
               </li>
-              <li style="opacity: 0.4">Tuning load balancingu</li>
-              <li style="opacity: 0.25">Identyfikacja najlepszych metryk</li>
-              <li style="opacity: 0.1">...</li>
+              <li class="fragment" data-fragment-index="1" style="opacity: 0.4">
+                Tuning load balancingu
+              </li>
+              <li
+                class="fragment"
+                data-fragment-index="1"
+                style="opacity: 0.25"
+              >
+                Identyfikacja najlepszych metryk
+              </li>
+              <li class="fragment" data-fragment-index="1" style="opacity: 0.1">
+                ...
+              </li>
             </ul>
           </section>
           <section>
@@ -780,23 +779,11 @@ function akcja3() {
           </section>
           <section>
             <div>Dzięki! 🙌</div>
-            <div
-              class="fragment"
-              data-fragment-index="1"
-              style="margin-top: 1em; font-size: 0.8em"
-            >
-              github.com/hzub
-            </div>
-            <div
-              class="fragment"
-              data-fragment-index="1"
-              style="margin-bottom: 1em; font-size: 0.8em"
-            >
+            <div style="margin-top: 1em; font-size: 0.8em">github.com/hzub</div>
+            <div style="margin-bottom: 1em; font-size: 0.8em">
               hubertzub.com
             </div>
-            <div class="fragment" data-fragment-index="2">
-              Idźcie i obserwujcie! 🖖
-            </div>
+            <div>Idźcie i obserwujcie! 🖖</div>
           </section>
         </section>
       </div>

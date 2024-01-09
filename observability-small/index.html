@@ -125,13 +125,13 @@
 
           <section>
             <h3 style="text-transform: none; font-weight: normal">dziś:</h3>
-            <h4 style="text-transform: none">grzechy, grzeszki & tipy</h4>
+            <h4 style="text-transform: none">pułapki, grzeszki & tipy</h4>
           </section>
         </section>
 
         <section data-background="#c6c6c6">
           <section>
-            <p><strong>Grzeszek-banał #1</strong></p>
+            <p><strong>Pułapka-banał #1</strong></p>
             <p>Nie raportujemy wszystkiego co mamy</p>
           </section>
 
@@ -180,7 +180,7 @@
             <h1>🫠</h1>
           </section> -->
           <section>
-            <p>Co pomoże?</p>
+            <p>Co pomoże - banały</p>
             <ul class="fragment">
               <li>historia URLi</li>
               <li><code style="opacity: 0.75">window.navigator.*</code></li>
@@ -201,7 +201,6 @@
             <ul class="fragment">
               <li>odbitka feature flag</li>
               <li>identyfikacja użytkownika</li>
-              <li>ewaluacja A/B</li>
             </ul>
           </section>
           <section>
@@ -271,11 +270,15 @@
             </aside>
           </section>
           <section>
-            <p><strong>Grzeszek #2</strong></p>
+            <p><strong>Pułapka #2</strong></p>
             <p>Logujemy za dużo</p>
             <aside class="notes">
               <li>można?</li>
             </aside>
+          </section>
+
+          <section>
+            <p>Kto ma dostęp do błędów? 🤔</p>
           </section>
           <section>
             <!-- <p>Przykład: API strzela 403, raportujemy błąd</p> -->
@@ -398,8 +401,8 @@
 // ...</script></code></pre>
             <aside class="notes">react-error-boundary</aside>
           </section> -->
-          <section>
-            <p><strong>Grzeszek #3</strong></p>
+          <!-- <section>
+            <p><strong>Pułapka #3</strong></p>
             <p>Niespójny kod wyjątków</p>
             <aside class="notes"></aside>
           </section>
@@ -438,11 +441,11 @@ function akcja3() {
   })
 }
             </code></pre>
-          </section>
+          </section> -->
         </section>
-        <section>
+        <!-- <section>
           Remedium: wymuszona struktura / lintery / testy raportowania!
-        </section>
+        </section> -->
         <section data-background="#c6c6c6">
           <section>
             <p>...a co jeśli logi nie przychodzą?</p>
@@ -459,7 +462,7 @@ function akcja3() {
             </aside>
           </section>
           <section>
-            <p><strong>Grzeszek #4</strong></p>
+            <p><strong>Pułapka #3</strong></p>
             <p>Nie testujemy observability/monitorowania</p>
           </section>
         </section>
@@ -495,23 +498,9 @@ function akcja3() {
               <li class="fragment">Statycznie (Lighthouse etc.)</li>
             </ul> -->
           </section>
-          <section>
-            <p><strong>Grzeszek #5</strong></p>
-            <p>Pomiarem wpływasz na pomiar</p>
-          </section>
 
           <section>
-            <div>Jak to rozwiązać?</div>
-            <ul>
-              <li class="fragment">
-                Banał: blokujące taski/kolejkowanie/async
-              </li>
-              <li class="fragment">Sampling</li>
-            </ul>
-          </section>
-
-          <section>
-            <p><strong>Grzeszek #6</strong></p>
+            <p><strong>Pułapka #4</strong></p>
             <p>Nie mierzymy wydajności z punktu widzenia użytkownika</p>
           </section>
 
@@ -636,7 +625,7 @@ function akcja3() {
         <section data-background="#185642">
           <section>
             <p>
-              <strong>Grzeszek #7</strong>
+              <strong>Pułapka #5</strong>
             </p>
             <p>Analityka oddzielona od monitoringu</p>
           </section>
@@ -669,6 +658,7 @@ function akcja3() {
 
           <section>
             <p>A to problem? 🤨</p>
+            <p>Niekoniecznie, ale...</p>
           </section>
           <section data-background="#74c9ad">
             <div class="r-stack">
